@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -19,6 +19,9 @@
   # environment.
   home.packages = [
     pkgs.waybar
+    pkgs.wofi
+    pkgs.grim
+    pkgs.slurp
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -74,4 +77,96 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+  wayland.windowManager.sway = {
+    enable = true;
+    config = {
+      modifier = "Mod4";
+      input."type:keyboard" = {
+        xkb_layout = "us";
+        xkb_variant = "altgr-intl";
+        xkb_options = "ctrl:nocaps,compose:rctrl";
+        repeat_delay = "330";
+        repeat_rate = "60";
+      };
+      input."type:touchpad" = {
+        tap = "enabled";
+        dwt = "enabled";
+        natural_scroll = "enabled";
+        middle_emulation = "enabled";
+      };
+      bars = [{
+        # position = "bottom";
+        # height = 30;
+        statusCommand = "${pkgs.waybar}/bin/waybar";
+      }];
+      keybindings = let
+        mod = config.wayland.windowManager.sway.config.modifier;
+        up = config.wayland.windowManager.sway.config.up;
+        down = config.wayland.windowManager.sway.config.down;
+        menu = config.wayland.windowManager.sway.config.menu;
+        term = config.wayland.windowManager.sway.config.terminal;
+      in
+      lib.mkOptionDefault {
+        "${mod}+space" = "layout toggle all";
+        "${mod}+${down}" = "focus next";
+        "${mod}+${up}" = "focus prev";
+        "${mod}+Shift+s" = "exec ${pkgs.grim}/bin/grim ~/Pictures/screenshots/$(date +%Y-%m-%d-%H-%M-%S).png";
+        "${mod}+Shift+x" = "exec ${pkgs.grim}/bin/grim -g \"$(slurp)\" ~/Pictures/screenshots/$(date +%Y-%m-%d-%H-%M-%S).png";
+        "${mod}+Shift+c" = "kill";
+        "${mod}+p" = "exec ${menu}";
+        "${mod}+q" = "reload";
+        "${mod}+1" = "[workspace=\"^1$\"] move workspace to output current; workspace number 1";
+        "${mod}+2" = "[workspace=\"^2$\"] move workspace to output current; workspace number 2";
+        "${mod}+3" = "[workspace=\"^3$\"] move workspace to output current; workspace number 3";
+        "${mod}+4" = "[workspace=\"^4$\"] move workspace to output current; workspace number 4";
+        "${mod}+5" = "[workspace=\"^5$\"] move workspace to output current; workspace number 5";
+        "${mod}+6" = "[workspace=\"^6$\"] move workspace to output current; workspace number 6";
+        "${mod}+7" = "[workspace=\"^7$\"] move workspace to output current; workspace number 7";
+        "${mod}+8" = "[workspace=\"^8$\"] move workspace to output current; workspace number 8";
+        "${mod}+9" = "[workspace=\"^9$\"] move workspace to output current; workspace number 9";
+        "${mod}+0" = "[workspace=\"^10$\"] move workspace to output current; workspace number 10";
+        "${mod}+l" = "exec '~/.config/swaylock/lock.sh'";
+        "${mod}+shift+p" = "exec sh -c 'swaymsg [app_id=\"dropdown_term\"] scratchpad show || exec ${term} --app-id dropdown_term'";
+        "XF86AudioRaiseVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ +5%";
+        "XF86AudioLowerVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ -5%";
+        "XF86AudioMute" = "exec pactl set-sink-mute @DEFAULT_SINK@ toggle";
+        "XF86AudioMicMute" = "exec pactl set-source-mute @DEFAULT_SOURCE@ toggle";
+        "XF86MonBrightnessDown" = "exec brightnessctl set 5%-";
+        "XF86MonBrightnessUp" = "exec brightnessctl set 5%+";
+        "XF86AudioPlay" = "exec playerctl play-pause";
+        "XF86AudioNext" = "exec playerctl next";
+        "XF86AudioPrev" = "exec playerctl previous";
+      };
+      output = {
+        "DP-2" = {
+          position = "0,0";
+        };
+        "eDP-1" = {
+          position = "1920,0";
+        };
+        "*" = {
+          background = "${pkgs.sway}/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill";
+        };
+      };
+      window.hideEdgeBorders = "both";
+      window.titlebar = false;
+      window.border = 0;
+    };
+    extraConfig = ''
+      exec swayidle -w \
+          timeout 900 '~/.config/swaylock/lock.sh' \
+          timeout 1200 'swaymsg "output * dpms off"' \
+      resume 'swaymsg "output * dpms on"' \
+      before-sleep '~/.config/swaylock/lock.sh'
+
+      exec wlsunset -l 40.1 -L -105.1
+      include /etc/sway/config.d/*
+      for_window [app_id="dropdown_term"] floating enable
+      for_window [app_id="dropdown_term"] border pixel 0
+      for_window [app_id="dropdown_term"] move scratchpad
+      for_window [app_id="dropdown_term"] scratchpad show
+      for_window [app_id="dropdown_term"] resize set 500 350
+      for_window [app_id="dropdown_term"] move position center
+    '';
+  };
 }

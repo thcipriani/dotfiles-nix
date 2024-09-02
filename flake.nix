@@ -11,7 +11,9 @@
 
   outputs = { self, nixpkgs, home-manager, ... }: {
 
-    muhHome = home-manager.lib.homeManagerConfiguration {
+    defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
+
+    homeConfigurations.thcipriani = home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs { system = "x86_64-linux"; };
       modules = [
         ./home.nix
