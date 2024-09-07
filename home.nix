@@ -110,6 +110,7 @@
         "${mod}+space" = "layout toggle all";
         "${mod}+${down}" = "focus next";
         "${mod}+${up}" = "focus prev";
+        "${mod}+Shift+Return" = "exec ${term}";
         "${mod}+Shift+s" = "exec ${pkgs.grim}/bin/grim ~/Pictures/screenshots/$(date +%Y-%m-%d-%H-%M-%S).png";
         "${mod}+Shift+x" = "exec ${pkgs.grim}/bin/grim -g \"$(slurp)\" ~/Pictures/screenshots/$(date +%Y-%m-%d-%H-%M-%S).png";
         "${mod}+Shift+c" = "kill";
