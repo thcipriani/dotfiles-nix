@@ -97,6 +97,7 @@
       bars = [{
         # position = "bottom";
         # height = 30;
+        command = "${pkgs.waybar}/bin/waybar";
         statusCommand = "${pkgs.waybar}/bin/waybar";
       }];
       keybindings = let
