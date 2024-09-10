@@ -171,4 +171,124 @@
       for_window [app_id="dropdown_term"] move position center
     '';
   };
+  # Mostly stolen from <https://github.com/kindrowboat/nix-config>
+  programs.waybar = {
+    enable = true;
+    settings = {
+      mainBar = {
+        height = 10;  # Waybar height (to be removed for auto height)
+        spacing = 4;  # Gaps between modules (4px)
+        output = [
+          "eDP-1"
+        ];
+
+        modules-left = [
+          "sway/workspaces"
+          "sway/mode"
+          "sway/scratchpad"
+          "custom/media"
+        ];
+
+        modules-center = [
+          "sway/window"
+        ];
+
+        modules-right = [
+          "idle_inhibitor"
+          "pulseaudio"
+          "cpu"
+          "memory"
+          "battery"
+          "battery#bat2"
+          "clock"
+          "network"
+          "tray"
+        ];
+
+        "sway/mode" = {
+          format = "<span style=\"italic\">{}</span>";
+        };
+
+        "sway/scratchpad" = {
+          format = "{icon} {count}";
+          show-empty = false;
+          format-icons = [ "" "" ];
+          tooltip = true;
+          tooltip-format = "{app}: {title}";
+        };
+
+        idle_inhibitor = {
+          format = "{icon}";
+          format-icons = {
+            activated = "";
+            deactivated = "";
+          };
+        };
+
+        tray = {
+          spacing = 10;
+        };
+
+        clock = {
+          format= "{:%c KW%V DOY%j}";
+          interval = 1;
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+        };
+
+        cpu = {
+          format = "CPU: {usage}%";
+          tooltip = false;
+        };
+
+        memory = {
+          format = "MEM: {}%";
+        };
+
+        battery = {
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          format = "{capacity}% {icon}";
+          format-full = "{capacity}% {icon}";
+          format-charging = "{capacity}% ";
+          format-plugged = "{capacity}% ";
+          format-alt = "{time} {icon}";
+          format-icons = [ "" "" "" "" "" ];
+        };
+
+        "battery#bat2" = {
+          bat = "BAT2";
+        };
+
+        network = {
+          format-wifi = "{essid} ({signalStrength}%) ";
+          format-ethernet = "{ipaddr}/{cidr} ";
+          tooltip-format = "{ifname} via {gwaddr} ";
+          format-linked = "{ifname} (No IP) ";
+          format-disconnected = "Disconnected ⚠";
+          format-alt = "{ifname}: {ipaddr}/{cidr}";
+        };
+
+        pulseaudio = {
+          format = "{volume}% {icon} {format_source}";
+          format-bluetooth = "{volume}% {icon} {format_source}";
+          format-bluetooth-muted = " {icon} {format_source}";
+          format-muted = " {format_source}";
+          format-source = "{volume}% ";
+          format-source-muted = "";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [ "" "" "" ];
+          };
+          on-click = "pavucontrol";
+        };
+      };
+    };
+  };
 }
