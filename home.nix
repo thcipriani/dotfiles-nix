@@ -80,6 +80,7 @@
   wayland.windowManager.sway = {
     enable = true;
     config = {
+      focus.newWindow = "urgent";
       modifier = "Mod4";
       input."type:keyboard" = {
         xkb_layout = "us";
