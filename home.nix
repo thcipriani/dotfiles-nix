@@ -94,12 +94,14 @@
         natural_scroll = "enabled";
         middle_emulation = "enabled";
       };
-      bars = [{
+      bars = [
+        # {
         # position = "bottom";
         # height = 30;
-        command = "${pkgs.waybar}/bin/waybar";
-        statusCommand = "${pkgs.waybar}/bin/waybar";
-      }];
+        # command = "${pkgs.waybar}/bin/waybar";
+        # statusCommand = "${pkgs.waybar}/bin/waybar";
+        # }
+      ];
       keybindings = let
         mod = config.wayland.windowManager.sway.config.modifier;
         up = config.wayland.windowManager.sway.config.up;
@@ -162,6 +164,15 @@
       before-sleep '~/.config/swaylock/lock.sh'
 
       exec wlsunset -l 40.1 -L -105.1
+      exec nm-applet --indicator
+      exec blueman-applet
+      exec pasystray
+      exec gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
+      exec gsettings set org.gnome.desktop.interface font-name 'Inter Medium 11'
+      exec gsettings set org.gnome.desktop.interface monospace-font-name 'Fira Code 11'
+      exec gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+      exec gsettings set org.gnome.desktop.interface cursor-theme 'Adwaita'
+      exec ${pkgs.waybar}/bin/waybar
       include /etc/sway/config.d/*
       for_window [app_id="dropdown_term"] floating enable
       for_window [app_id="dropdown_term"] border pixel 0
@@ -176,45 +187,37 @@
     enable = true;
     settings = {
       mainBar = {
-        height = 10;  # Waybar height (to be removed for auto height)
-        spacing = 4;  # Gaps between modules (4px)
-        output = [
-          "eDP-1"
-        ];
+        height = 32;  # Waybar height (to be removed for auto height)
+        spacing = 8;  # Spacing between modules
+        # output = [
+        #   "eDP-1"
+        # ];
 
         modules-left = [
           "sway/workspaces"
           "sway/mode"
-          "sway/scratchpad"
-          "custom/media"
         ];
 
-        modules-center = [
-          "sway/window"
-        ];
+        modules-center = [];
 
         modules-right = [
           "idle_inhibitor"
-          "pulseaudio"
+          "custom/weather"
           "cpu"
           "memory"
-          "battery"
-          "battery#bat2"
-          "clock"
-          "network"
           "tray"
+          "battery"
+          "clock"
         ];
 
         "sway/mode" = {
           format = "<span style=\"italic\">{}</span>";
         };
 
-        "sway/scratchpad" = {
-          format = "{icon} {count}";
-          show-empty = false;
-          format-icons = [ "" "" ];
-          tooltip = true;
-          tooltip-format = "{app}: {title}";
+        "custom/weather" = {
+          format = "{}";
+          exec = "$HOME/bin/weather";
+          interval = 1800;
         };
 
         idle_inhibitor = {
@@ -226,11 +229,14 @@
         };
 
         tray = {
-          spacing = 10;
+          spacing = 8;
+          icon-size = 22;
+          icon-theme = "Papirus";
         };
 
         clock = {
-          format= "{:%c KW%V DOY%j}";
+          format = "{:%c}";
+          format-alt = "{:%VKW %jDOY}";
           interval = 1;
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
         };
@@ -249,16 +255,12 @@
             warning = 30;
             critical = 15;
           };
-          format = "{capacity}% {icon}";
-          format-full = "{capacity}% {icon}";
-          format-charging = "{capacity}% ";
-          format-plugged = "{capacity}% ";
+          format = "{icon} {capacity}%";
+          format-full = "{icon} {capacity}%";
+          format-charging = "  {capacity}%";
+          format-plugged = "  {capacity}%";
           format-alt = "{time} {icon}";
           format-icons = [ "" "" "" "" "" ];
-        };
-
-        "battery#bat2" = {
-          bat = "BAT2";
         };
 
         network = {
